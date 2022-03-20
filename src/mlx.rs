@@ -36,6 +36,7 @@ use crate::MlxWindow;
 /// 	int 		end_loop;
 /// }				t_xvar;
 /// ```
+#[derive(Debug)]
 pub struct Mlx {
     display: *mut Display,
     screen: i32,
@@ -67,6 +68,7 @@ impl Mlx {
     fn int_get_visual(&mut self) -> i32 {
         // Handle if visual class is not TrueColor
         // Error for some reason `Visual` doenst seem to have `class`
+        // https://docs.rs/x11/2.19.1/x11/xlib/struct.Visual.html
         // if *visual.class != xlib::TrueColor {
 
         // }
@@ -79,13 +81,15 @@ impl Mlx {
     ///
     /// `int		mlx_int_deal_shm(t_xvar *xvar)`
     fn int_deal_shm(&mut self) {
-        unimplemented!()
+        // self.use_xshm = xlib::XshmQueryVersion(self.display)
+        return;
     }
 
     /// TrueColor Visual is needed to have *_mask correctly set
     /// `int		mlx_int_rgb_conversion(t_xvar *xvar)`
     fn int_rgb_conversion(&mut self) {
-        unimplemented!()
+        // unimplemented!()
+        return;
     }
 
     pub fn new_window() {
@@ -123,5 +127,15 @@ impl Default for Mlx {
             decrgb: [0; 6],
             end_loop: false,
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test() {
+        let mlx = Mlx::new();
+        dbg!(mlx);
     }
 }

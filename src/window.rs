@@ -17,6 +17,9 @@ use x11::xlib::{Window, GC};
 /// }				t_win_list;
 ///
 /// ```
+///
+
+#[derive(Debug)]
 pub struct MlxWindow {
     window: Window,
     gc: GC,
