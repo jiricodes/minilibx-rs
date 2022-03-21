@@ -2,8 +2,6 @@
 name = "minilibx-rs"
 version = "0.1.0"
 edition = "2021"
-links = "X11"
-build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -11,5 +9,5 @@ build = "build.rs"
 xlib = []
 
 [dependencies]
-libc = "0.2.28"
-x11 = "2.19.1"
+x11 = { git = "https://github.com/AltF02/x11-rs.git", features = ["xlib", "dpms"]}
+gethostname = "0.2.3"

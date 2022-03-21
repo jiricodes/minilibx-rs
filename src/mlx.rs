@@ -4,8 +4,8 @@
 
 use std::ptr;
 
-use x11::xlib;
 use x11::xlib::{Colormap, Depth, Display, Screen, Visual, Window};
+use x11::{xlib, xshm};
 
 use crate::MlxWindow;
 
@@ -81,7 +81,33 @@ impl Mlx {
     ///
     /// `int		mlx_int_deal_shm(t_xvar *xvar)`
     fn int_deal_shm(&mut self) {
-        // self.use_xshm = xlib::XshmQueryVersion(self.display)
+        use gethostname::gethostname;
+        use std::env;
+
+        let mut bidon: i32 = 0;
+        let mut use_pshm: i32 = 0;
+        self.use_xshm =
+            unsafe { xshm::XShmQueryVersion(self.display, &mut bidon, &mut bidon, &mut use_pshm) }
+                != 0;
+        if self.use_xshm && use_pshm != 0 {
+            self.pshm_format = unsafe { xshm::XShmPixmapFormat(self.display) };
+        } else {
+            self.pshm_format = -1;
+        }
+        let hostname = gethostname();
+        let host_str = hostname
+            .to_str()
+            .expect("could not transform hostname to str");
+        if let Ok(dpy) = env::var("DISPLAY") {
+            if dpy.len() > 0
+                && dpy.chars().nth(0).unwrap() != ':'
+                && !dpy.starts_with(host_str)
+                && !dpy.starts_with("localhost")
+            {
+                self.pshm_format = -1;
+                self.use_xshm = false;
+            }
+        }
         return;
     }
 

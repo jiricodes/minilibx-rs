@@ -4,6 +4,7 @@ Rust version of [Ecole 42's minilibx](https://github.com/42Paris/minilibx-linux)
 Leverages [x11 crate](https://github.com/AltF02/x11-rs) that contains all bindings.
 
 ## TODO
+- [ ] switch to official x11 with next release where xshm is fixed
 - [ ] README
 - [ ] docs according to `man`
 - [ ] mlx_init.c
