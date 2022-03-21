@@ -37,3 +37,6 @@ Leverages [x11 crate](https://github.com/AltF02/x11-rs) that contains all bindin
 - [ ] mlx_destroy_image.c
 - [ ] mlx_mouse.c mlx_screen_size.c
 - [ ] mlx_destroy_display.c
+
+## LICENSE
+Same as the original C minilibx-linux [license](https://github.com/42Paris/minilibx-linux/blob/master/LICENSE).
