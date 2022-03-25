@@ -26,8 +26,8 @@ pub struct MlxWindow {
 }
 
 impl MlxWindow {
-    pub fn new() -> Self {
-        unimplemented!()
+    pub fn new(window: Window, gc: GC) -> Self {
+        Self { window, gc }
     }
 
     pub fn clear() {

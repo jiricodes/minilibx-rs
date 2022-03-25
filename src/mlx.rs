@@ -2,9 +2,15 @@
 //!
 //!
 
+use std::ffi::CString;
+use std::mem::MaybeUninit;
 use std::ptr;
 
-use x11::xlib::{Colormap, Depth, Display, Screen, Visual, Window};
+use x11::xlib::{
+    CWBackPixel, CWBorderPixel, CWColormap, CWEventMask, Colormap, CopyFromParent, Depth, Display,
+    InputOutput, PMaxSize, PMinSize, PPosition, PSize, Screen, Visual, Window, XCreateWindow,
+    XGCValues, XSetWMNormalHints, XSetWindowAttributes, XSizeHints, XStoreName,
+};
 use x11::{xlib, xshm};
 
 use crate::MlxWindow;
@@ -118,8 +124,69 @@ impl Mlx {
         return;
     }
 
-    pub fn new_window() {
-        unimplemented!()
+    pub fn new_window(&mut self, size_x: u32, size_y: u32, title: &str) {
+        let xswa = Box::new(XSetWindowAttributes {
+            background_pixmap: 0,
+            background_pixel: 0,
+            border_pixmap: 0,
+            border_pixel: u64::MAX,
+            bit_gravity: 0,
+            win_gravity: 0,
+            backing_store: 0,
+            backing_planes: 0,
+            backing_pixel: 0,
+            save_under: 0,
+            event_mask: 0xFFFFFF, // all events
+            do_not_propagate_mask: 0,
+            override_redirect: 0,
+            colormap: self.cmap,
+            cursor: 0,
+        });
+
+        let new_window = unsafe {
+            XCreateWindow(
+                self.display,
+                self.root,
+                0,
+                0,
+                size_x,
+                size_y,
+                0,
+                CopyFromParent,
+                InputOutput as u32,
+                self.visual,
+                CWEventMask | CWBackPixel | CWBorderPixel | CWColormap,
+                Box::into_raw(xswa),
+            )
+        };
+        // Anti-resize
+        // TODO: Should this be to toggle?
+        self.anti_resize_win(new_window, size_x, size_y);
+        // XStoreName
+        let title = CString::new(title).unwrap();
+        unsafe { XStoreName(self.display, new_window, title.as_ptr()) };
+        // TODO:
+        // XSetWMProtocols
+        // Create GC
+        // add to vec
+        // hooks
+        // xMApRaised
+        // wait first expopse
+        // return something significant xD
+    }
+
+    /// int	mlx_int_anti_resize_win(t_xvar *xvar,Window win,int w,int h)
+    fn anti_resize_win(&mut self, window: Window, size_x: u32, size_y: u32) {
+        let hints: XSizeHints = unsafe { MaybeUninit::<XSizeHints>::zeroed().assume_init() };
+        let mut hints = Box::new(hints);
+        hints.width = size_x as i32;
+        hints.height = size_y as i32;
+        hints.min_width = size_x as i32;
+        hints.min_height = size_y as i32;
+        hints.max_width = size_x as i32;
+        hints.max_height = size_y as i32;
+        hints.flags = PPosition | PSize | PMinSize | PMaxSize;
+        unsafe { XSetWMNormalHints(self.display, window, Box::into_raw(hints)) };
     }
 }
 
@@ -161,7 +228,8 @@ mod test {
     use super::*;
     #[test]
     fn test() {
-        let mlx = Mlx::new();
-        dbg!(mlx);
+        let mut mlx = Mlx::new();
+        dbg!(&mlx);
+        mlx.anti_resize_win(0, 10, 10);
     }
 }
